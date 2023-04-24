@@ -1,0 +1,60 @@
+name: Build & Release
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  app_build:
+    needs: page_build
+    name: Build (${{ matrix.os }} - ${{ matrix.arch }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ windows-latest ]
+        arch: [ x64, arm64 ]
+        include:
+        - os: windows-latest
+          arch: ia32
+        exclude:
+        - os: windows-latest
+          arch: arm64
+
+    steps:
+      - name: Checkout app Repository
+        uses: actions/checkout@v3
+      - name: Install Nodejs
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.12.1
+          cache: npm
+      - name: Install Dependency And Compile TS
+        run: |
+          npm i
+          npm run build:prod
+      - name: Copy Json Windows-latest
+        if: matrix.os == 'windows-latest'
+        run:
+          copy package*.json dist
+      - name: Install Production Denpency
+        run: npm ci --production
+        working-directory: ./dist
+      - name: Make Package
+        run: npm run make
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          draft: true
+          files: |
+            out/make/**/*.deb
+            out/make/**/*.dmg
+            out/make/**/*.exe
+            out/make/**/*.nupkg
+            out/make/**/*.rpm
+            out/make/**/*.zip
+            out/make/**/RELEASES
