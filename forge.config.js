@@ -14,7 +14,6 @@ module.exports = {
       ".gitignore",
       ".vscode",
     ],
-    icon: 'static/logo'
   },
   rebuildConfig: {},
   makers: [
@@ -26,7 +25,6 @@ module.exports = {
         exe: 'menghuan-tool.exe',
         noMsi: true,
         setupExe: `menghuan-tool-${version}-win32-${arch}-setup.exe`,
-        setupIcon: path.resolve(__dirname, 'static', 'logo.ico'),
       }),
     },
   ],

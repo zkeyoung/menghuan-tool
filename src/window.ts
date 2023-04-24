@@ -16,7 +16,7 @@ function createWindow(): Promise<BrowserWindow> {
       },
     }
     if (process.platform === 'win32') {
-      bwOption.icon = path.resolve(__dirname, '../static/logo.ico');
+      // bwOption.icon = path.resolve(__dirname, '../static/logo.ico');
     }
     const window = new BrowserWindow(bwOption);
     window.loadFile(pagePath);
